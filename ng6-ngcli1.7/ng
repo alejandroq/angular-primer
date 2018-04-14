@@ -1,0 +1,5 @@
+# !/bin/bash
+
+set -x
+
+docker run -v $PWD:/app angulardev/ngcli ng $@

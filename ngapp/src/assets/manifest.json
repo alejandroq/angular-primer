@@ -1,0 +1,19 @@
+{
+  "short_name": "Ngapp",
+  "name": "Angular 5.0 PWA",
+  "start_url": "/",
+
+  "theme_color": "#f2f2f2",
+  "background_color": "#ffffff",
+
+  "display": "standalone",
+  "orientation": "portrait",
+
+  "icons": [
+    {
+      "src": "/assets/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
