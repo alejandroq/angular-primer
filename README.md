@@ -230,3 +230,319 @@ The browser requires the `manifest.json` for prompting web app download to devic
 ![Stats](/assets/4-1.png)
 
 Our PWA score is now 91. When we deliver via HTTPS, it will be 100.
+
+## Migrate from Angular5 to Angular6
+
+_If you already maintain an application and would rather not replace your entire `package.json`; checkout this [upgrade guide](https://angular-update-guide.firebaseapp.com/)_
+
+* Let's update out experiment from Angular5 to Angular6-rc4. Replace your `package.json` as so and then run `rm -r node_modules && npm install`:
+
+```json
+{
+  "name": "ngapp",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build --prod",
+    "test": "ng test",
+    "lint": "ng lint",
+    "e2e": "ng e2e"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular-devkit/core": "0.5.6",
+    "@angular/animations": "^6.0.0-rc.4",
+    "@angular/common": "^6.0.0-rc.4",
+    "@angular/compiler": "^6.0.0-rc.4",
+    "@angular/core": "^6.0.0-rc.4",
+    "@angular/forms": "^6.0.0-rc.4",
+    "@angular/http": "^6.0.0-rc.4",
+    "@angular/platform-browser": "^6.0.0-rc.4",
+    "@angular/platform-browser-dynamic": "^6.0.0-rc.4",
+    "@angular/platform-server": "^6.0.0-rc.4",
+    "@angular/router": "^6.0.0-rc.4",
+    "@angular/service-worker": "^6.0.0-rc.4",
+    "core-js": "^2.4.1",
+    "rxjs": "^6.0.0-beta.1",
+    "rxjs-compat": "^6.0.0-uncanny-rc.7",
+    "zone.js": "^0.8.26"
+  },
+  "devDependencies": {
+    "@angular-devkit/core": "0.3.2",
+    "@angular-devkit/schematics": "^0.5.6",
+    "@angular/cli": "1.7.4",
+    "@angular/compiler-cli": "^6.0.0-rc.4",
+    "@angular/language-service": "^6.0.0-rc.4",
+    "@types/jasmine": "~2.8.6",
+    "@types/jasminewd2": "~2.0.2",
+    "@types/node": "~9.6.5",
+    "codelyzer": "^4.0.1",
+    "jasmine-core": "~3.1.0",
+    "jasmine-spec-reporter": "~4.2.1",
+    "karma": "~2.0.0",
+    "karma-chrome-launcher": "~2.2.0",
+    "karma-cli": "~1.0.1",
+    "karma-coverage-istanbul-reporter": "^1.2.1",
+    "karma-jasmine": "~1.1.0",
+    "karma-jasmine-html-reporter": "^1.0.0",
+    "protractor": "~5.3.1",
+    "ts-node": "~5.0.1",
+    "tslint": "~5.9.1",
+    "typescript": "2.7.2"
+  }
+}
+```
+
+* AngularCLI 1.7 comes with a bundle analyzer. Update your `.angular-cli.json` accordingly to enable:
+
+```json
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "project": {
+    "name": "ngapp"
+  },
+  "apps": [
+    {
+      "root": "src",
+      "outDir": "dist",
+      "assets": ["assets", "favicon.ico"],
+      "index": "index.html",
+      "main": "main.ts",
+      "polyfills": "polyfills.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.app.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "app",
+      "styles": [],
+      "scripts": [],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      },
+      "serviceWorker": true,
+      "appShell": {
+        "app": "ngu-app-shell",
+        "route": "app-shell-path"
+      },
+      "budgets": [
+        {
+          "type": "bundle",
+          "name": "main",
+          "baseline": "300kb",
+          "warning": "30kb"
+        },
+        { "type": "bundle", "name": "races", "maximumWarning": "360kb" },
+        { "type": "allScript", "baseline": "1.4mb", "maximumError": "100kb" },
+        { "type": "initial", "baseline": "1.6mb", "error": "100kb" },
+        { "type": "any", "maximumError": "500kb" }
+      ]
+    },
+    {
+      "root": "src",
+      "outDir": "dist-server",
+      "assets": ["assets", "favicon.ico"],
+      "index": "index.html",
+      "main": "main.server.ts",
+      "test": "test.ts",
+      "tsconfig": "tsconfig.server.json",
+      "testTsconfig": "tsconfig.spec.json",
+      "prefix": "app",
+      "styles": [],
+      "scripts": [],
+      "environmentSource": "environments/environment.ts",
+      "environments": {
+        "dev": "environments/environment.ts",
+        "prod": "environments/environment.prod.ts"
+      },
+      "serviceWorker": true,
+      "platform": "server",
+      "name": "ngu-app-shell"
+    }
+  ],
+  "e2e": {
+    "protractor": {
+      "config": "./protractor.conf.js"
+    }
+  },
+  "lint": [
+    {
+      "project": "src/tsconfig.app.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "src/tsconfig.spec.json",
+      "exclude": "**/node_modules/**"
+    },
+    {
+      "project": "e2e/tsconfig.e2e.json",
+      "exclude": "**/node_modules/**"
+    }
+  ],
+  "test": {
+    "karma": {
+      "config": "./karma.conf.js"
+    }
+  },
+  "defaults": {
+    "styleExt": "css",
+    "component": {}
+  }
+}
+```
+
+* Let's benchmark with Lighthouse and `ng build --prod --aot`:
+
+![Stats](/assets/5-1.png)
+
+Its "First-Paint" time has greatly improved! A feat accomplished by a simple upgrade. How significant is every 100ms?
+
+* How does our bundle analysis look?
+
+![Bundle Analysis](/assets/5-2.png)
+
+## Routes
+
+* Lets create a lazy loaded route.
+
+```sh
+$ ng g m routetwo --skip-import && ng g c routetwo --skip-import
+```
+
+* Apply this to your `src/app-routing.module.ts`:
+
+```ts
+const routes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    component: AppComponent
+  },
+  {
+    path: "routetwo",
+    pathMatch: "full",
+    loadChildren: "./routes/routetwo/routetwo-routing.module#RoutetwoModule"
+  },
+  {
+    path: "**",
+    pathMatch: "full",
+    redirectTo: ""
+  }
+];
+```
+
+The AngularCLI will intelligently chunk the RoutetwoModule. When a user visits said route, the module will lazy load without the user savvy.
+
+* The `src/routes/routetwo-routing.module.ts` should look as so:
+
+```ts
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { RoutetwoComponent } from "./routetwo.component";
+
+const routes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    component: RoutetwoComponent
+  },
+  {
+    path: "**",
+    pathMatch: "full",
+    redirectTo: ""
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+  declarations: [RoutetwoComponent]
+})
+export class RoutetwoRoutingModule {}
+```
+
+This module will handle component declaration and sub-routes for the RotuetwoModule. Further layers can also be lazy loaded as handled before.
+
+## Extra Credit
+
+### Prettier and VSCode
+
+* For code formatting lets take advantage of VSCode's plugin for PrettierJS. This specific plugins identifier is as so: `esbenp.prettier-vscode`.
+
+* Create a `.prettierrc` file with the following contents:
+
+```json
+{
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "bracketSpacing": true
+}
+```
+
+* Create a `settings.json` with the following contents:
+
+```json
+{
+  "editor.formatOnSave": true,
+  "[javascript]": {
+    "editor.formatOnSave": true
+  }
+}
+```
+
+What does this do? View the following before and after. The before becomes the after upon saving the document:
+
+```text
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+import { RoutetwoComponent } from './routetwo.component';
+
+const routes: Routes = [
+  { path: '', pathMatch:
+  'full', component: RoutetwoComponent },
+  {
+    path: '**', pathMatch: 'full', redirectTo: '' },
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [
+    RouterModule
+
+  ],
+  declarations: [RoutetwoComponent],
+})
+export class RoutetwoRoutingModule {
+
+
+
+}
+```
+
+```ts
+import { NgModule } from "@angular/core";
+import { Routes, RouterModule } from "@angular/router";
+import { RoutetwoComponent } from "./routetwo.component";
+
+const routes: Routes = [
+  {
+    path: "",
+    pathMatch: "full",
+    component: RoutetwoComponent
+  },
+  {
+    path: "**",
+    pathMatch: "full",
+    redirectTo: ""
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule],
+  declarations: [RoutetwoComponent]
+})
+export class RoutetwoRoutingModule {}
+```

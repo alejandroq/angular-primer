@@ -26,7 +26,19 @@
       "appShell": {
         "app": "ngu-app-shell",
         "route": "app-shell-path"
-      }
+      },
+      "budgets": [
+        {
+          "type": "bundle",
+          "name": "main",
+          "baseline": "300kb",
+          "warning": "30kb"
+        },
+        { "type": "bundle", "name": "races", "maximumWarning": "360kb" },
+        { "type": "allScript", "baseline": "1.4mb", "maximumError": "100kb" },
+        { "type": "initial", "baseline": "1.6mb", "error": "100kb" },
+        { "type": "any", "maximumError": "500kb" }
+      ]
     },
     {
       "root": "src",
